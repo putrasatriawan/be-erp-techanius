@@ -1,0 +1,81 @@
+/vendor/
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Laravel
+/public/storage
+/storage/*.key
+.env
+.env.backup
+.env.local
+.env.*.backup
+Homestead.yaml
+Homestead.json
+
+# Laravel logs & cache
+/storage/logs/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/framework/cache/*
+/storage/framework/testing/*
+/bootstrap/cache/*.php
+bootstrap/cache/packages.php
+bootstrap/cache/services.php
+bootstrap/cache/*.json
+
+# Laravel Octane
+/.rr.yml
+
+# PHPStorm / IDE
+.idea/
+*.iml
+
+# VSCode
+.vscode/
+.history/
+
+# Mac / OS Files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Composer
+composer.lock
+composer.phar
+
+# Node builds
+/public/js/
+/public/css/
+/public/mix-manifest.json
+
+# Nwidart Modules auto cache
+Modules/*/module.json.cache
+Modules/*/vendor/
+
+# Logs
+*.log
+
+# PHPUnit
+.phpunit.result.cache
+
+# Docker
+docker-compose.override.yml
+
+# Temporary dev files
+*.swp
+*.swo
+
+# Uploads (optional — hapus jika ingin commit upload)
+public/uploads/
+storage/app/uploads/
+
+# Local DB dumps
+*.sql
+*.sqlite
+*.dump
