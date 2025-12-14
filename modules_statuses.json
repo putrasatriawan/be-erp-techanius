@@ -1,4 +1,5 @@
 {
     "Auth": true,
-    "DynamicAuth": true
+    "DynamicAuth": true,
+    "Users": true
 }
