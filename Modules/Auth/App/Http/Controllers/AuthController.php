@@ -6,57 +6,71 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Kreait\Laravel\Firebase\Facades\Firebase;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function firebaseLogin(Request $request)
     {
         $data = $request->validate([
             'email' => 'required|email',
-            'password' => 'required|string',
+            'name'  => 'required|string',
         ]);
 
-        if (!$token = auth('api')->attempt($data)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Invalid credentials',
-            ], 401);
+        $auth = Firebase::auth();
+
+        // ===============================
+        // 1️⃣ CEK / CREATE USER FIREBASE
+        // ===============================
+        try {
+            $firebaseUser = $auth->getUserByEmail($data['email']);
+        } catch (\Kreait\Firebase\Exception\Auth\UserNotFound $e) {
+
+            $firebaseUser = $auth->createUser([
+                'email' => $data['email'],
+                'password' => str()->random(16),
+                'displayName' => $data['name'],
+                'emailVerified' => false,
+            ]);
         }
 
-        return $this->tokenResponse($token);
-    }
+        $firebaseUid = $firebaseUser->uid;
 
-    /**
-     * Firebase login (opsional): client kirim firebase_uid,
-     * lalu server mapping ke user dan issue JWT.
-     */
-    public function firebaseLogin(Request $request)
-    {
-        // firebase_uid & email DIAMBIL DARI MIDDLEWARE
-        $firebaseUid = $request->firebase_uid;
-        $email       = $request->firebase_email;
-
+        // ===============================
+        // 2️⃣ CEK / CREATE USER DB
+        // ===============================
         $user = User::where('firebase_uid', $firebaseUid)->first();
 
         if (!$user) {
             $user = User::create([
-                'name' => $email ?? 'User',
-                'email' => $email ?? ('firebase_' . $firebaseUid . '@local.test'),
-                'password' => Hash::make(Str::random(32)),
+                'name'         => $data['name'],
+                'email'        => $data['email'],
+                'password'     => Hash::make(str()->random(32)),
                 'firebase_uid' => $firebaseUid,
             ]);
 
-            // default role dari DB
+            // role default (Spatie)
             $user->assignRole('staff');
         }
 
+        // ===============================
+        // 3️⃣ JWT TOKEN
+        // ===============================
         $token = JWTAuth::fromUser($user);
 
-        return $this->tokenResponse($token);
+        return response()->json([
+            'token' => $token,
+            'type'  => 'bearer',
+            'user'  => [
+                'id' => $user->id,
+                'firebase_uid' => $firebaseUid,
+                'name' => $user->name,
+                'email' => $user->email,
+                'roles' => $user->getRoleNames(),
+            ],
+        ]);
     }
-
 
     public function me()
     {

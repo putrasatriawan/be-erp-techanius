@@ -3,32 +3,22 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
-use Kreait\Firebase\Exception\Auth\FailedToVerifyToken;
-use App\Models\User;
-use Kreait\Firebase\Auth;
+
+use Kreait\Laravel\Firebase\Facades\Firebase;
 
 class FirebaseAuthMiddleware
 {
-    public function __construct(private Auth $auth) {}
-
-    public function handle(Request $request, Closure $next)
+    public function handle($request, Closure $next)
     {
-        $header = $request->header('Authorization');
+        $idToken = $request->bearerToken();
 
-        if (!$header || !str_starts_with($header, 'Bearer ')) {
+        if (!$idToken) {
             return response()->json(['message' => 'Firebase token missing'], 401);
         }
 
-        $token = str_replace('Bearer ', '', $header);
-
         try {
-            $verified = $this->auth->verifyIdToken($token);
-
-            $request->merge([
-                'firebase_uid' => $verified->claims()->get('sub'),
-                'firebase_email' => $verified->claims()->get('email'),
-            ]);
+            $verifiedToken = Firebase::auth()->verifyIdToken($idToken);
+            $request->firebase_uid = $verifiedToken->claims()->get('sub');
         } catch (\Throwable $e) {
             return response()->json(['message' => 'Invalid Firebase token'], 401);
         }

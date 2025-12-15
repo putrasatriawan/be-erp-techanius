@@ -1,19 +1,19 @@
 <?php
 
 use Illuminate\Http\Request;
-use Kreait\Firebase\Auth;
+use Kreait\Laravel\Firebase\Facades\Firebase;
 use Illuminate\Support\Facades\Route;
 use Modules\Auth\App\Http\Controllers\AuthController;
 
 
 
 Route::get('/firebase-debug', function () {
-    $auth = app(Auth::class);
+    $auth = Firebase::auth();
 
-    return [
+    return response()->json([
         'status' => 'ok',
-        'project_id' => $auth->getApiClient()->getProjectId(),
-    ];
+        'project' => config('firebase.default'),
+        'credential' => config('firebase.projects.app.credentials'),
+    ]);
 });
-Route::post('/auth/firebase-login', [AuthController::class, 'firebaseLogin'])
-    ->middleware('firebase.auth');
+Route::post('/auth/firebase-login', [AuthController::class, 'firebaseLogin']);
