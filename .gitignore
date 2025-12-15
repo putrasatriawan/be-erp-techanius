@@ -45,10 +45,6 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
-# Composer
-composer.lock
-composer.phar
-
 # Node builds
 /public/js/
 /public/css/
