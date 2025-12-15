@@ -79,3 +79,6 @@ storage/app/uploads/
 *.sql
 *.sqlite
 *.dump
+
+# Firebase config file
+/storage/app/firebase/*.json

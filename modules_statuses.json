@@ -2,5 +2,6 @@
     "Auth": true,
     "DynamicAuth": true,
     "Users": true,
-    "Role": true
+    "Role": true,
+    "RBAC": true
 }
